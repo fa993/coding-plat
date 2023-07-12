@@ -22,9 +22,9 @@ router.post('/add', async (req, res) => {
 			{
 				method: 'POST',
 				body: JSON.stringify({
-					input: inp,
+					input: inp || '',
 					output: exp,
-					time: time || 1,
+					timeLimit: time || 1,
 					judgeId: 10,
 				}),
 				headers: { 'Content-Type': 'application/json' },
@@ -41,7 +41,7 @@ router.post('/add', async (req, res) => {
 
 		console.log(data);
 
-		await TestCase.create({
+		const tc = await TestCase.create({
 			number: num,
 			inp: inp || '',
 			expected: exp,
@@ -50,7 +50,7 @@ router.post('/add', async (req, res) => {
 			sphere_number: data.number,
 		});
 
-		res.sendStatus(200);
+		res.send(tc._id);
 	} catch (ex) {
 		return res.sendStatus(404);
 	}
@@ -66,19 +66,52 @@ router.get('/list', async (req, res) => {
 });
 
 router.post('/edit', async (req, res) => {
-	const { id, inp, exp, time } = req.body;
-	const tc = await TestCase.findById(id);
-	if (exp) {
-		tc.expected = exp;
+	try {
+		const { id, inp, exp, time } = req.body;
+		const tc = await TestCase.findById(id);
+		const question = await Question.findById(tc.question_id);
+		if (exp) {
+			tc.expected = exp;
+		}
+		if (inp) {
+			tc.input = inp;
+		}
+		if (time) {
+			tc.time_limit = time;
+		}
+		const response = await fetch(
+			SPHERE_API_BASE_PR_URL +
+				question.sphere_id +
+				'/testcases/' +
+				tc.sphere_number +
+				'?access_token=' +
+				process.env.SPHERE_ACCESS_TOKEN,
+			{
+				method: 'PUT',
+				body: JSON.stringify({
+					input: inp || '',
+					output: exp,
+					timeLimit: time || 1,
+				}),
+				headers: { 'Content-Type': 'application/json' },
+			}
+		);
+
+		if (!response.ok) {
+			console.log(await response.text());
+
+			return res.sendStatus(500);
+		}
+
+		const data = await response.json();
+
+		console.log(data);
+
+		await tc.save();
+		return res.sendStatus(200);
+	} catch (ex) {
+		res.sendStatus(404);
 	}
-	if (inp) {
-		tc.input = inp;
-	}
-	if (time) {
-		tc.time_limit = time;
-	}
-	await tc.save();
-	return res.sendStatus(200);
 });
 
 module.exports = router;
