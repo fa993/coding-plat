@@ -44,7 +44,7 @@ router.get('/list', async (req, res) => {
 	);
 });
 
-router.post('/edit', async (req, res) => {
+router.put('/edit', async (req, res) => {
 	const { id, title, desc } = req.body;
 	try {
 		const question = await Question.findById(id);
@@ -83,7 +83,7 @@ router.post('/edit', async (req, res) => {
 	}
 });
 
-router.post('/delete', async (req, res) => {
+router.delete('/delete', async (req, res) => {
 	const { id } = req.body;
 	try {
 		const qu = await Question.findById(id);

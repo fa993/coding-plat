@@ -65,7 +65,7 @@ router.get('/list', async (req, res) => {
 	);
 });
 
-router.post('/edit', async (req, res) => {
+router.put('/edit', async (req, res) => {
 	try {
 		const { id, inp, exp, time } = req.body;
 		const tc = await TestCase.findById(id);
