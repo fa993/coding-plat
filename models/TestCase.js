@@ -25,6 +25,11 @@ const testcaseSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Sphere API linkage is required'],
 	},
+
+	time_limit: {
+		type: Number,
+		default: 1,
+	},
 });
 
 module.exports = mongoose.model('TestCase', testcaseSchema);

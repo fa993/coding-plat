@@ -1,10 +1,10 @@
 const router = require('express').Router();
-const Question = require('../../../models/Question');
-const TestCase = require('../../../models/TestCase');
+const Question = require('../../../../models/Question');
+const TestCase = require('../../../../models/TestCase');
 const fetch = require('node-fetch');
 
 const SPHERE_API_BASE_PR_URL =
-	'https://a328555b.problems.sphere-engine.com/api/v4/problems/';
+	'https://a328555b.problems.sphere-engine.com/api/v4/problems';
 
 router.post('/add', async (req, res) => {
 	const { title, desc } = req.body;
@@ -20,6 +20,7 @@ router.post('/add', async (req, res) => {
 	);
 
 	if (!response.ok) {
+		console.log(await response.text());
 		return res.sendStatus(500);
 	}
 
@@ -56,6 +57,7 @@ router.post('/edit', async (req, res) => {
 
 		const response = await fetch(
 			SPHERE_API_BASE_PR_URL +
+				'/' +
 				question.sphere_id +
 				'?access_token=' +
 				process.env.SPHERE_ACCESS_TOKEN,
@@ -87,6 +89,7 @@ router.post('/delete', async (req, res) => {
 		const qu = await Question.findById(id);
 		const response = await fetch(
 			SPHERE_API_BASE_PR_URL +
+				'/' +
 				+qu.sphere_id +
 				'?access_token=' +
 				process.env.SPHERE_ACCESS_TOKEN,
@@ -99,6 +102,7 @@ router.post('/delete', async (req, res) => {
 			console.log(await response.text());
 			return res.sendStatus(500);
 		}
+		await TestCase.deleteMany({ question_id: id });
 		await Question.deleteOne({ _id: id });
 	} catch (ex) {
 		console.log(ex);
