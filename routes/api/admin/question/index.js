@@ -9,6 +9,7 @@ const SPHERE_API_BASE_PR_URL =
 router.post('/add', async (req, res) => {
 	const { title, desc } = req.body;
 
+	//1000 is the id for the generic master judge
 	const response = await fetch(
 		SPHERE_API_BASE_PR_URL + '?access_token=' + process.env.SPHERE_ACCESS_TOKEN,
 		{
@@ -23,8 +24,6 @@ router.post('/add', async (req, res) => {
 	}
 
 	const data = await response.json();
-
-	console.log(data);
 
 	const question = await Question.create({
 		title,
