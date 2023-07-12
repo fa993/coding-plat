@@ -24,8 +24,8 @@ router.use(
 		} else {
 			return res.sendStatus(403);
 		}
-	}
-	// require('./participant')
+	},
+	require('./participant')
 );
 
 module.exports = router;

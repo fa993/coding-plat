@@ -57,12 +57,17 @@ router.post('/add', async (req, res) => {
 });
 
 router.get('/list', async (req, res) => {
-	const { id, offset } = req.body;
-	return res.json(
-		await TestCase.find({ question_id: id })
-			.skip(offset || 0)
-			.limit(5)
-	);
+	try {
+		const id = req.query.id;
+		const offset = req.query.offset;
+		return res.json(
+			await TestCase.find({ question_id: id })
+				.skip(offset || 0)
+				.limit(5)
+		);
+	} catch (ex) {
+		res.sendStatus(404);
+	}
 });
 
 router.put('/edit', async (req, res) => {

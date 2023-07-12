@@ -36,10 +36,9 @@ router.post('/add', async (req, res) => {
 });
 
 router.get('/list', async (req, res) => {
-	const { offset } = req.body;
 	return res.json(
 		await Question.find({})
-			.skip(offset || 0)
+			.skip(req.query.offset || 0)
 			.limit(5)
 	);
 });
