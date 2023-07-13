@@ -115,10 +115,10 @@ To get a local copy up and running follow these simple example steps.
 - [x] Admin API: CRUD functions for question
 - [x] Admin API: CRUD function for testcases
 - [x] Participant API: Ability to select questions and submit problems for those questions.
-- [x] Paginated the lists for viewing testcases and questions
+- [x] **Paginated the lists for viewing testcases and questions**
 - [x] Viewing questions available to both roles
-- [x] Mail the participants their own solutions
-- [x] Frontend to demo the core features
+- [x] **Mail the participants their own submissions**
+- [x] **Frontend to demo the core features**
 
 See the [open issues](https://github.com/fa993/coding-plat/issues) for a full list of proposed features (and known issues).
 
