@@ -55,6 +55,8 @@
 
             </tbody>
         </table>
+        <button onclick="qPrevPage()">Prev Page</button>
+        <button onclick="qNextPage()">Next Page</button>
         <div style="display: none;" id="tcview">
             <h2>TestCases</h2>
             <input id="num" placeholder="Enter number">
@@ -76,6 +78,8 @@
 
                 </tbody>
             </table>
+            <button onclick="tcPrevPage()">Prev Page</button>
+            <button onclick="tcNextPage()">Next Page</button>
         </div>
         <script type="text/javascript">
             var mode=""
@@ -92,7 +96,9 @@
             var tcout = document.getElementById('out')
             var tclim = document.getElementById('limit')
             var tct = document.getElementById('tstcs')
-            var curqid
+            var curqid = undefined;
+            var qpg = 0;
+            var tcpg = 0;
 
             function startLoadingAnimation() {
                 loading = true;
@@ -159,7 +165,7 @@
             }
 
             function populateTestCases() {
-                fetch(window.location.origin + '/api/admin/testcase/list?id=' + curqid).then(t => {
+                fetch(window.location.origin + '/api/admin/testcase/list?id=' + curqid + '&offset=' + (tcpg * 5)).then(t => {
                     if(t.ok) {
                         return t.json(); 
                     } else {
@@ -198,7 +204,7 @@
             }
 
             function populateQuestionTable() {
-                fetch(window.location.origin + '/api/admin/question/list').then(t => {
+                fetch(window.location.origin + '/api/admin/question/list?offset=' + (qpg * 5)).then(t => {
                     if(t.ok) {
                         return t.json(); 
                     } else {
@@ -231,6 +237,34 @@
                         c4.appendChild(sbe)
                     });
                 })
+            }
+
+            function qNextPage() {
+                qpg += 1;
+                populateQuestionTable();
+            }
+            
+            function qPrevPage() {
+                if(qpg == 0) {
+                    //do nothing
+                } else {
+                    qpg -= 1;
+                    populateQuestionTable();
+                }
+            }
+
+            function tcNextPage() {
+                tcpg += 1;
+                populateTestCases();
+            }
+
+            function tcPrevPage() {
+                if(tcpg == 0) {
+                    //do nothing
+                } else {
+                    tcpg -= 1;
+                    populateTestCases();
+                }
             }
 
             function addQuestion() {

@@ -1,0 +1,186 @@
+<html>
+    <head>
+        <title>Coding Platform - Participant</title>
+        <style>
+            body {
+                text-align: center;
+            }
+            div, h3, textarea {
+                margin-top: 20px;
+            }
+            table {
+                margin: auto;
+                width: 80%;
+            }
+            td, th {
+                width: 25%;
+                text-align: center;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <h1>Problem</h1>
+        <div id="status"></div>
+        <div id="selectview">
+            <h2>Select Problem to solve</h2>
+            <table id="qs">
+                <thead>
+                    <tr class="tbqr">
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tbbo">
+    
+                </tbody>
+            </table>
+            <button onclick="qPrevPage()">Prev Page</button>
+            <button onclick="qNextPage()">Next Page</button>
+        </div>
+        <div id="solveview" style="display: none;">
+            <h3 id="title"></h3>
+            <div id="descr"></div>
+            <textarea id="submission"></textarea>
+            <br>
+            <div>
+                Language:
+                <select id="lang">
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+            <br>
+            <button onclick="actualselect()">Back</button>
+            <button onclick="createSubmission()" id="sub">Submit</button>
+        </div>
+        <script type="text/javascript">
+            var qpg = 0;
+            var sta = document.getElementById('status')
+            var qarr = {};
+            var tbl = document.getElementById('qs');
+            var tbody = document.getElementById('tbbo');
+            var solver = document.getElementById('solveview');
+            var selecter = document.getElementById('selectview');
+            var title = document.getElementById('title');
+            var desc = document.getElementById('descr');
+            var src = document.getElementById('submission');
+            var isselectview = true;
+            curq = undefined
+            var actualselect;
+            var sel = document.getElementById('lang')
+
+            function startLoadingAnimation() {
+                loading = true;
+                nextTick(0)
+            }
+
+            function nextTick(iin) {
+                animh = setInterval((i) => {
+                    st = "Loading";
+                    for(var ty = 0; ty < i; ty++) {
+                        st += '.';
+                    }
+                    if(loading) {
+                        sta.innerHTML = st;
+                        nextTick((i + 1) % 3)
+                    }
+                }, 200, iin)
+            }
+
+            function cancelAnimation() {
+                loading = false;
+            }
+
+            function selectQuestion(eleid) {
+                return () => {
+                    curq = eleid;
+                    actualselect();
+                }
+            }
+
+            function fetchQuestions() {
+                fetch(window.location.origin + '/api/question/list?offset=' + (qpg * 5)).then(t => {
+                    if(t.ok) {
+                        return t.json(); 
+                    } else {
+                        sta.innerHTML = "Could not load data";
+                        console.log(t.text())
+                    }
+                }).then(t => {
+                    tbody.innerHTML = '';
+                    t.forEach(element => {
+                        qarr[element._id] = element;
+                        var row = tbody.insertRow() 
+                        row.className = "tbqr";  
+                        c1 = row.insertCell(0);
+                        c1.innerHTML = element._id
+                        c2 = row.insertCell(1);
+                        c2.innerHTML = element.title
+                        c3 = row.insertCell(2);
+                        c3.innerHTML = element.description;   
+                        c4 = row.insertCell(3);
+                        sbe = document.createElement('button');
+                        sbe.innerHTML = "Select";
+                        sbe.addEventListener('click', selectQuestion(element._id));
+                        c4.appendChild(sbe)
+                    });
+                })
+            }
+
+            function initSolver() {
+                title.innerHTML = qarr[curq].title;
+                desc.innerHTML = qarr[curq].description;
+            }
+
+            actualselect = () => {
+                isselectview = !isselectview;
+                if(isselectview) {
+                    selecter.style.display = 'block';
+                    solver.style.display = 'none';
+                    fetchQuestions();
+                } else {
+                    selecter.style.display = 'none';
+                    solver.style.display = 'block';
+                    initSolver();
+                }
+            }
+
+            function qNextPage() {
+                qpg += 1;
+                fetchQuestions();
+            }
+            
+            function qPrevPage() {
+                if(qpg == 0) {
+                    //do nothing
+                } else {
+                    qpg -= 1;
+                    fetchQuestions();
+                }
+            }
+
+            function createSubmission() {
+                startLoadingAnimation();
+                fetch(window.location.origin + '/api/participant/create', {method: 'POST', body: JSON.stringify({lang: sel.value, src: src.value, question_id: curq}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                    cancelAnimation();
+                    if (t.ok) {
+                        sta.innerHTML = 'Submission Finished'
+                        return t.text()
+                    } else {
+                        sta.innerHTML = 'Submission Failed'
+                        console.log(t.text())
+                    }
+                })
+            }
+
+            function checkSubmission() {
+                
+            }
+
+            fetchQuestions();
+        </script>
+    </body>
+</html>

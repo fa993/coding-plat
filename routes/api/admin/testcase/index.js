@@ -39,8 +39,6 @@ router.post('/add', async (req, res) => {
 
 		const data = await response.json();
 
-		console.log(data);
-
 		const tc = await TestCase.create({
 			number: num,
 			inp: inp || '',
