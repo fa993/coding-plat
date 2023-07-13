@@ -15,27 +15,31 @@
         <h1>
             <b>Login</b>
         </h1>
+        <div id="status"></div>
         <input id="email" placeholder="Enter email">
         <br>
         <input type="password" id="psswd" placeholder="Enter password">
         <br>
         <button id="subbtn">Login</button>
         <script type="text/javascript">
-            document.getElementById('subbtn').addEventListener('click', e => {
-                usnam = document.getElementById('email').value;
-                pas = document.getElementById('psswd').value;
-                fetch(window.location.origin + "/login", {method: 'POST', body: JSON.stringify({email: usnam, password: pas}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                    if(t.ok) {
-                        return t.json();
-                    } else {
-                        console.log(t.text())
-                    }}).then(f => {
+            document.getElementById('subbtn').addEventListener('click', async e => {
+                usnam = document.getElementById('email');
+                pas = document.getElementById('psswd');
+                stat = document.getElementById('status');
+                resp = await fetch(window.location.origin + "/login", {method: 'POST', body: JSON.stringify({email: usnam.value, password: pas.value}), headers: {'Content-Type': 'application/json'}});
+                if(resp.ok) {
+                    f = await resp.json();
                     if(f.role=='admin') {
                         location.href='admin.html'
                     } else {
                         location.href='participant.html'
                     }
-                })
+                } else {
+                    usnam.value = '';
+                    pas.value = '';
+                    stat.innerHTML = (await resp.json()).message;
+                    console.log(stat.value)
+                }
             });
         </script>
     </body>

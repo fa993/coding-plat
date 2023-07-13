@@ -106,7 +106,7 @@
             }
 
             function nextTick(iin) {
-                animh = setInterval((i) => {
+                animh = setTimeout((i) => {
                     st = "Loading";
                     for(var ty = 0; ty < i; ty++) {
                         st += '.';
@@ -123,19 +123,17 @@
             }
 
             function deleteQuestion(eleid) {
-                return () => {
+                return async () => {
                     startLoadingAnimation();
-                    fetch(window.location.origin + "/api/admin/question/delete", {method: 'DELETE', body: JSON.stringify({id: eleid}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                        cancelAnimation()
-                        if(t.ok) {
-                            sta.innerHTML="Action Completed";
-                        } else {
-                            console.log(t.text())
-                            sta.innerHTML = "Action Failed"
-                        }
-                    }).then(t => {
+                    resp = await fetch(window.location.origin + "/api/admin/question/delete", {method: 'DELETE', body: JSON.stringify({id: eleid}), headers: {'Content-Type': 'application/json'}});
+                    cancelAnimation()
+                    if(resp.ok) {
+                        sta.innerHTML="Action Completed";
                         populateQuestionTable();
-                    })
+                    } else {
+                        sta.innerHTML = "Action Failed"
+                        console.log(await resp.text())
+                    }
                 }
             }
 
@@ -148,31 +146,23 @@
                 }
             }
 
-            function addTestCase() {
+            async function addTestCase() {
                 startLoadingAnimation();
-                fetch(window.location.origin + "/api/admin/testcase/add", {method: 'POST', body: JSON.stringify({question_id: curqid, num: tcnum.value, exp: tcout.value, time: tclim.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                    cancelAnimation()
-                    if(t.ok) {
-                        sta.innerHTML="Action Completed";
-                        return t.text();
-                    } else {
-                        console.log(t.text())
-                        sta.innerHTML = "Action Failed"
-                    }
-                }).then(t => {
+                resp = await fetch(window.location.origin + "/api/admin/testcase/add", {method: 'POST', body: JSON.stringify({question_id: curqid, num: tcnum.value, exp: tcout.value, time: tclim.value}), headers: {'Content-Type': 'application/json'}});
+                cancelAnimation()
+                if(resp.ok) {
+                    sta.innerHTML="Action Completed";
                     populateTestCases();
-                })
+                } else {
+                    console.log(await resp.text())
+                    sta.innerHTML = "Action Failed"
+                }
             }
 
-            function populateTestCases() {
-                fetch(window.location.origin + '/api/admin/testcase/list?id=' + curqid + '&offset=' + (tcpg * 5)).then(t => {
-                    if(t.ok) {
-                        return t.json(); 
-                    } else {
-                        sta.innerHTML = "Could not load data";
-                        console.log(t.text())
-                    }
-                }).then(t => {
+            async function populateTestCases() {
+                resp = await fetch(window.location.origin + '/api/admin/testcase/list?id=' + curqid + '&offset=' + (tcpg * 5));
+                if(resp.ok) {
+                    t =  await resp.json();
                     tct.innerHTML = '';
                     t.forEach(element => {
                         var row = tct.insertRow();
@@ -188,7 +178,10 @@
                         c5 = row.insertCell(4);
                         c5.innerHTML = element.time_limit + 's';
                     });
-                });
+                } else {
+                    sta.innerHTML = "Could not load data";
+                    console.log(await resp.text())
+                }
             }   
 
             function selectQuestion(eleid) {
@@ -203,15 +196,10 @@
                 }
             }
 
-            function populateQuestionTable() {
-                fetch(window.location.origin + '/api/admin/question/list?offset=' + (qpg * 5)).then(t => {
-                    if(t.ok) {
-                        return t.json(); 
-                    } else {
-                        sta.innerHTML = "Could not load data";
-                        console.log(t.text())
-                    }
-                }).then(t => {
+            async function populateQuestionTable() {
+                resp = await fetch(window.location.origin + '/api/admin/question/list?offset=' + (qpg * 5));
+                if(resp.ok) {
+                    t =  await resp.json(); 
                     tbody.innerHTML = '';
                     t.forEach(element => {
                         var row = tbody.insertRow() 
@@ -236,7 +224,10 @@
                         sbe.addEventListener('click', selectQuestion(element._id));
                         c4.appendChild(sbe)
                     });
-                })
+                } else {
+                    sta.innerHTML = "Could not load data";
+                    console.log(await resp.text())
+                }
             }
 
             function qNextPage() {
@@ -267,37 +258,31 @@
                 }
             }
 
-            function addQuestion() {
+            async function addQuestion() {
                 startLoadingAnimation();
-                fetch(window.location.origin + "/api/admin/question/add", {method: 'POST', body: JSON.stringify({title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                    cancelAnimation()
-                    if(t.ok) {
-                        sta.innerHTML="Action Completed";
-                        return t.text();
-                    } else {
-                        console.log(t.text())
-                        sta.innerHTML = "Action Failed"
-                    }
-                }).then(t => {
+                resp = await fetch(window.location.origin + "/api/admin/question/add", {method: 'POST', body: JSON.stringify({title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}});
+                cancelAnimation()
+                if(resp.ok) {
+                    sta.innerHTML="Action Completed";
                     populateQuestionTable();
-                })
-
+                } else {
+                    console.log(await resp.text())
+                    sta.innerHTML = "Action Failed"
+                }
             }
 
-            function actualEdit(eleid) {
+            async function actualEdit(eleid) {
                 startLoadingAnimation();
-                fetch(window.location.origin + "/api/admin/question/edit", {method: 'PUT', body: JSON.stringify({id: eleid, title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                    cancelAnimation()
-                    if(t.ok) {
-                        sta.innerHTML="Action Completed";
-                        return t.text();
-                    } else {
-                        console.log(t.text())
-                        sta.innerHTML = "Action Failed"
-                    }
-                }).then(t => {
+                resp = await fetch(window.location.origin + "/api/admin/question/edit", {method: 'PUT', body: JSON.stringify({id: eleid, title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}});
+                cancelAnimation()
+                if(resp.ok) {
+                    sta.innerHTML="Action Completed";
                     populateQuestionTable();
-                })
+                } else {
+                    console.log(await resp.text())
+                    sta.innerHTML = "Action Failed"
+                }
+                
             }
 
             document.getElementById('save').addEventListener('click', e => {

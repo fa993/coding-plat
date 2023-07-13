@@ -75,6 +75,6 @@ router.post('/create', async (req, res) => {
 	}
 });
 
-router.get('/results', require('./results'));
+router.use('/results', require('./results'));
 
 module.exports = router;

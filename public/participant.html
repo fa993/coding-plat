@@ -53,6 +53,9 @@
                 </select>
             </div>
             <br>
+            <div id="results">
+
+            </div>
             <button onclick="actualselect()">Back</button>
             <button onclick="createSubmission()" id="sub">Submit</button>
         </div>
@@ -67,8 +70,10 @@
             var title = document.getElementById('title');
             var desc = document.getElementById('descr');
             var src = document.getElementById('submission');
+            var res = document.getElementById('results');
             var isselectview = true;
-            curq = undefined
+            var curq = undefined
+            var cursub = undefined;
             var actualselect;
             var sel = document.getElementById('lang')
 
@@ -78,7 +83,7 @@
             }
 
             function nextTick(iin) {
-                animh = setInterval((i) => {
+                animh = setTimeout((i) => {
                     st = "Loading";
                     for(var ty = 0; ty < i; ty++) {
                         st += '.';
@@ -101,15 +106,10 @@
                 }
             }
 
-            function fetchQuestions() {
-                fetch(window.location.origin + '/api/question/list?offset=' + (qpg * 5)).then(t => {
-                    if(t.ok) {
-                        return t.json(); 
-                    } else {
-                        sta.innerHTML = "Could not load data";
-                        console.log(t.text())
-                    }
-                }).then(t => {
+            async function fetchQuestions() {
+                var resp = await fetch(window.location.origin + '/api/question/list?offset=' + (qpg * 5));
+                if (resp.ok){
+                    var t = await resp.json(); 
                     tbody.innerHTML = '';
                     t.forEach(element => {
                         qarr[element._id] = element;
@@ -127,7 +127,10 @@
                         sbe.addEventListener('click', selectQuestion(element._id));
                         c4.appendChild(sbe)
                     });
-                })
+                } else {
+                    sta.innerHTML = "Could not load data";
+                    console.log(await resp.text())
+                }
             }
 
             function initSolver() {
@@ -162,22 +165,49 @@
                 }
             }
 
-            function createSubmission() {
-                startLoadingAnimation();
-                fetch(window.location.origin + '/api/participant/create', {method: 'POST', body: JSON.stringify({lang: sel.value, src: src.value, question_id: curq}), headers: {'Content-Type': 'application/json'}}).then(t => {
-                    cancelAnimation();
-                    if (t.ok) {
-                        sta.innerHTML = 'Submission Finished'
-                        return t.text()
-                    } else {
-                        sta.innerHTML = 'Submission Failed'
-                        console.log(t.text())
+            async function checkSubmission() {
+                resp = await fetch(window.location.origin + '/api/participant/results?id=' + cursub);
+                if(resp.ok) {
+                    if(resp.status == 200) {
+                        return await resp.json();
+                    } else if(resp.status == 202) {
+                        res.innerHTML = "Submission is being evaulated"
+                        return Promise.resolve(undefined);
                     }
-                })
+                } else {
+                    console.log(await resp.text());
+                }
             }
 
-            function checkSubmission() {
-                
+            async function intervalSubmission() {
+                ans = await checkSubmission();
+                if(!ans) {
+                    cancelAnimation();
+                    sta.innerHTML = '';
+                    res.innerHTML = "Evaluation Status: " + ans.status.name;
+                } else {
+                    setTimeout(intervalSubmission, 200 + (Math.random() * 100))
+                }
+            }
+
+            function startPeriodicChecking() {
+                //random backoff here
+                startLoadingAnimation();
+                setTimeout(intervalSubmission, 200)
+            }
+
+            async function createSubmission() {
+                startLoadingAnimation();
+                resp = await fetch(window.location.origin + '/api/participant/create', {method: 'POST', body: JSON.stringify({lang: sel.value, src: src.value, question_id: curq}), headers: {'Content-Type': 'application/json'}});
+                cancelAnimation();
+                if (resp.ok) {
+                    sta.innerHTML = 'Submission Finished'
+                    cursub = await resp.text()
+                    startPeriodicChecking();
+                } else {
+                    sta.innerHTML = 'Submission Failed'
+                    console.log(resp.text())
+                }
             }
 
             fetchQuestions();
