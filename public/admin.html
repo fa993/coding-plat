@@ -289,11 +289,7 @@
 
             async function logout() {
                 resp = await fetch(window.location.origin + "/logout", {method: 'POST'});
-                if(resp.ok) {
-                    window.location.href = "/";
-                } else {
-                    sta.innerHTML = "Could not logout";
-                }
+                window.location.href = "/";
             }
 
             document.getElementById('save').addEventListener('click', e => {

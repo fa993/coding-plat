@@ -50,6 +50,12 @@ This project contains the backend for the coding platform. Most of that code is 
 
 A frontend for this has also been built as part of the task which serves to demonstrate the functionality of the API.
 
+Postman docs: [https://documenter.getpostman.com/view/19472614/2s946e9tCW](https://documenter.getpostman.com/view/19472614/2s946e9tCW)
+
+Deployed URL: [https://coding-plat.onrender.com](https://coding-plat.onrender.com)
+
+Both the frontend and backend are at the same url
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
