@@ -70,6 +70,10 @@ A Demonstration video showing a participant submitting a code challenge
 
 ![demo](./assets/ParticipantSubmission.gif)
 
+A Demonstration video showing an admin creating a code challenge and subsequently deleting it
+
+![demo](./assets/AdminSubmission.gif)
+
 _For more examples, please refer to the [Documentation](https://documenter.getpostman.com/view/19472614/2s946e9tCW)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
