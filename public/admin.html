@@ -271,6 +271,8 @@
                     console.log(await resp.text())
                     sta.innerHTML = "Action Failed"
                 }
+                nm.value = '';
+                de.value = '';
             }
 
             async function actualEdit(eleid) {
@@ -284,7 +286,8 @@
                     console.log(await resp.text())
                     sta.innerHTML = "Action Failed"
                 }
-                
+                nm.value = '';
+                de.value = '';
             }
 
             async function logout() {

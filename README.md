@@ -68,6 +68,8 @@ Both the frontend and backend are at the same url
 
 A Demonstration video showing a participant submitting a code challenge
 
+![demo](./assets/ParticipantSubmission.gif)
+
 _For more examples, please refer to the [Documentation](https://documenter.getpostman.com/view/19472614/2s946e9tCW)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -119,6 +121,7 @@ To get a local copy up and running follow these simple example steps.
 - [x] Viewing questions available to both roles
 - [x] **Mail the participants their own submissions**
 - [x] **Frontend to demo the core features**
+- [x] JWT whitelist for more secure token management
 
 See the [open issues](https://github.com/fa993/coding-plat/issues) for a full list of proposed features (and known issues).
 
