@@ -13,21 +13,29 @@
     </head>
     <body>
         <h1>
-            <b>Login</b>
+            <b>Signup</b>
         </h1>
         <div id="status"></div>
         <input id="email" placeholder="Enter email">
         <br>
         <input type="password" id="psswd" placeholder="Enter password">
         <br>
-        <button onclick="window.location.href='signup.html'">Signup</button>
-        <button id="subbtn">Login</button>
+        <input id="username" placeholder="Enter username">
+        <br>
+        <select id="role" placeholder="Enter role">
+            <option value="admin">Admin</option>
+            <option value="participant">Participant</option>
+        </select>
+        <br>
+        <button id="subbtn">Signup</button>
         <script type="text/javascript">
             document.getElementById('subbtn').addEventListener('click', async e => {
-                usnam = document.getElementById('email');
+                ema = document.getElementById('email');
                 pas = document.getElementById('psswd');
+                username = document.getElementById('username');
+                role = document.getElementById('role')
                 stat = document.getElementById('status');
-                resp = await fetch(window.location.origin + "/login", {method: 'POST', body: JSON.stringify({email: usnam.value, password: pas.value}), headers: {'Content-Type': 'application/json'}});
+                resp = await fetch(window.location.origin + "/signup", {method: 'POST', body: JSON.stringify({email: ema.value, password: pas.value, username: username.value, role: role.value}), headers: {'Content-Type': 'application/json'}});
                 if(resp.ok) {
                     f = await resp.json();
                     if(f.role=='admin') {
@@ -36,8 +44,9 @@
                         location.href='participant.html'
                     }
                 } else {
-                    usnam.value = '';
+                    ema.value = '';
                     pas.value = '';
+                    username.value = '';
                     stat.innerHTML = (await resp.json()).message;
                     console.log(stat.value)
                 }

@@ -2,6 +2,9 @@ const router = require('express').Router();
 const Question = require('../../../models/Question');
 const fetch = require('node-fetch');
 
+const SPHERE_API_BASE_SB_URL =
+	'https://a328555b.problems.sphere-engine.com/api/v4/submissions';
+
 router.get('/', async (req, res) => {
 	const id = req.query.id;
 

@@ -22,7 +22,9 @@ if (!isProduction) {
 if (isProduction) {
 	mongoose.connect(process.env.MONGODB_URI);
 } else {
-	mongoose.connect('mongodb://localhost/coding-plat');
+	mongoose.connect(
+		process.env.MONGODB_URI || 'mongodb://localhost/coding-plat'
+	);
 	mongoose.set('debug', true);
 }
 

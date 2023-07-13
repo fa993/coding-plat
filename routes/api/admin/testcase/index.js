@@ -106,10 +106,6 @@ router.put('/edit', async (req, res) => {
 			return res.sendStatus(500);
 		}
 
-		const data = await response.json();
-
-		console.log(data);
-
 		await tc.save();
 		return res.sendStatus(200);
 	} catch (ex) {

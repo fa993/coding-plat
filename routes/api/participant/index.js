@@ -32,8 +32,6 @@ router.post('/create', async (req, res) => {
 			res.sendStatus(401);
 		}
 
-		console.log(lngid);
-
 		const response = await fetch(
 			SPHERE_API_BASE_SB_URL +
 				'?access_token=' +
@@ -57,7 +55,7 @@ router.post('/create', async (req, res) => {
 		const data = await response.json();
 
 		const mailData = {
-			from: 'app@gmail.com', // sender address
+			from: 'auto@codingplat.com', // sender address
 			to: req.user.email, // list of receivers
 			subject: 'Re: Code Submission',
 			text: "Here's a copy of your source code",
