@@ -9,8 +9,20 @@
                 margin: auto;
                 width: 80%;
             }
-            td,th {
+            .tbqr > td {
                 width: 25%;
+                text-align: center;
+            }
+            .tbqr > th {
+                width: 25%;
+                text-align: center;
+            }
+            .tbtr > td {
+                width: 20%;
+                text-align: center;
+            }
+            .tbtr > th {
+                width: 20%;
                 text-align: center;
             }
             #status {
@@ -32,7 +44,7 @@
         <br>
         <table id="qs">
             <thead>
-                <tr>
+                <tr class="tbqr">
                     <th>ID</th>
                     <th>Name</th>
                     <th>Description</th>
@@ -80,6 +92,7 @@
             var tcout = document.getElementById('out')
             var tclim = document.getElementById('limit')
             var tct = document.getElementById('tstcs')
+            var curqid
 
             function startLoadingAnimation() {
                 loading = true;
@@ -129,6 +142,61 @@
                 }
             }
 
+            function addTestCase() {
+                startLoadingAnimation();
+                fetch(window.location.origin + "/api/admin/testcase/add", {method: 'POST', body: JSON.stringify({question_id: curqid, num: tcnum.value, exp: tcout.value, time: tclim.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                    cancelAnimation()
+                    if(t.ok) {
+                        sta.innerHTML="Action Completed";
+                        return t.text();
+                    } else {
+                        console.log(t.text())
+                        sta.innerHTML = "Action Failed"
+                    }
+                }).then(t => {
+                    populateTestCases();
+                })
+            }
+
+            function populateTestCases() {
+                fetch(window.location.origin + '/api/admin/testcase/list?id=' + curqid).then(t => {
+                    if(t.ok) {
+                        return t.json(); 
+                    } else {
+                        sta.innerHTML = "Could not load data";
+                        console.log(t.text())
+                    }
+                }).then(t => {
+                    tct.innerHTML = '';
+                    t.forEach(element => {
+                        var row = tct.insertRow();
+                        row.className = "tbtr";  
+                        c1 = row.insertCell(0);
+                        c1.innerHTML = element._id
+                        c2 = row.insertCell(1);
+                        c2.innerHTML = element.number
+                        c3 = row.insertCell(2);
+                        c3.innerHTML = element.input;   
+                        c4 = row.insertCell(3);
+                        c4.innerHTML = element.expected;
+                        c5 = row.insertCell(4);
+                        c5.innerHTML = element.time_limit + 's';
+                    });
+                });
+            }   
+
+            function selectQuestion(eleid) {
+                return () => {
+                    if(tcview.style.display == 'block' && eleid == curqid) {
+                        tcview.style.display = 'none';
+                        return;
+                    }
+                    tcview.style.display = "block";
+                    curqid = eleid;
+                    populateTestCases(eleid)
+                }
+            }
+
             function populateQuestionTable() {
                 fetch(window.location.origin + '/api/admin/question/list').then(t => {
                     if(t.ok) {
@@ -140,7 +208,8 @@
                 }).then(t => {
                     tbody.innerHTML = '';
                     t.forEach(element => {
-                        var row = tbody.insertRow()   
+                        var row = tbody.insertRow() 
+                        row.className = "tbqr";  
                         c1 = row.insertCell(0);
                         c1.innerHTML = element._id
                         c2 = row.insertCell(1);
@@ -156,6 +225,10 @@
                         dbe.innerHTML = "Delete";
                         dbe.addEventListener('click', deleteQuestion(element._id))
                         c4.appendChild(dbe)
+                        sbe = document.createElement('button');
+                        sbe.innerHTML = "Select";
+                        sbe.addEventListener('click', selectQuestion(element._id));
+                        c4.appendChild(sbe)
                     });
                 })
             }
@@ -193,10 +266,6 @@
                 })
             }
 
-            function populateTestCases() {
-
-            }
-
             document.getElementById('save').addEventListener('click', e => {
                 if(mode == '') {
                     addQuestion();
@@ -205,6 +274,10 @@
                     mode = '';
                 }
             });
+
+            document.getElementById('savetc').addEventListener('click', e => {
+                addTestCase()
+            })
 
             populateQuestionTable();
         </script>
