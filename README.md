@@ -66,6 +66,18 @@ Both the frontend and backend are at the same url
 
 ## Demo
 
+There are 2 demonstrations account already in the db:
+
+Admin:
+email: junk@junk.com
+password: asd
+
+Participant:
+email: part@parti.com
+password:asd
+
+Although participant accounts with real emails will have to be used to test the email feature
+
 A Demonstration video showing a participant submitting a code challenge
 
 ![demo](./assets/ParticipantSubmission.gif)
