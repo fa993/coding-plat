@@ -23,11 +23,36 @@
         <button onclick="window.location.href='signup.html'">Signup</button>
         <button id="subbtn">Login</button>
         <script type="text/javascript">
+            var sta = document.getElementById('status');
+
+            function startLoadingAnimation() {
+                loading = true;
+                nextTick(0)
+            }
+
+            function nextTick(iin) {
+                animh = setTimeout((i) => {
+                    st = "Loading";
+                    for(var ty = 0; ty < i; ty++) {
+                        st += '.';
+                    }
+                    if(loading) {
+                        sta.innerHTML = st;
+                        nextTick((i + 1) % 3)
+                    }
+                }, 500, iin)
+            }
+
+            function cancelAnimation() {
+                loading = false;
+            }
+
             document.getElementById('subbtn').addEventListener('click', async e => {
                 usnam = document.getElementById('email');
                 pas = document.getElementById('psswd');
-                stat = document.getElementById('status');
+                startLoadingAnimation();
                 resp = await fetch(window.location.origin + "/login", {method: 'POST', body: JSON.stringify({email: usnam.value, password: pas.value}), headers: {'Content-Type': 'application/json'}});
+                cancelAnimation();
                 if(resp.ok) {
                     f = await resp.json();
                     if(f.role=='admin') {
@@ -38,10 +63,11 @@
                 } else {
                     usnam.value = '';
                     pas.value = '';
-                    stat.innerHTML = (await resp.json()).message;
-                    console.log(stat.value)
+                    sta.innerHTML = (await resp.json()).message;
+                    console.log(sta.innerHTML)
                 }
             });
+
         </script>
     </body>
 </html>

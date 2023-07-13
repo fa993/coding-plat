@@ -29,12 +29,36 @@
         <br>
         <button id="subbtn">Signup</button>
         <script type="text/javascript">
+
+            var sta = document.getElementById('status');
+
+            function startLoadingAnimation() {
+                loading = true;
+                nextTick(0)
+            }
+
+            function nextTick(iin) {
+                animh = setTimeout((i) => {
+                    st = "Loading";
+                    for(var ty = 0; ty < i; ty++) {
+                        st += '.';
+                    }
+                    if(loading) {
+                        sta.innerHTML = st;
+                        nextTick((i + 1) % 3)
+                    }
+                }, 500, iin)
+            }
+
+            function cancelAnimation() {
+                loading = false;
+            }
+
             document.getElementById('subbtn').addEventListener('click', async e => {
                 ema = document.getElementById('email');
                 pas = document.getElementById('psswd');
                 username = document.getElementById('username');
                 role = document.getElementById('role')
-                stat = document.getElementById('status');
                 resp = await fetch(window.location.origin + "/signup", {method: 'POST', body: JSON.stringify({email: ema.value, password: pas.value, username: username.value, role: role.value}), headers: {'Content-Type': 'application/json'}});
                 if(resp.ok) {
                     f = await resp.json();
@@ -47,8 +71,8 @@
                     ema.value = '';
                     pas.value = '';
                     username.value = '';
-                    stat.innerHTML = (await resp.json()).message;
-                    console.log(stat.value)
+                    sta.innerHTML = (await resp.json()).message;
+                    console.log(sta.innerHTML)
                 }
             });
         </script>
