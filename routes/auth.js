@@ -26,6 +26,7 @@ router.post('/signup', async (req, res) => {
 		message: 'User signed in successfully',
 		success: true,
 		email,
+		role: user.role,
 	});
 });
 
@@ -49,7 +50,9 @@ router.post('/login', async (req, res) => {
 		maxAge: 24 * 3600 * 1000,
 	});
 	req.app.get('token-whitelist').add(token);
-	res.status(200).json({ message: 'User logged in successfully', email });
+	res
+		.status(200)
+		.json({ message: 'User logged in successfully', email, role: user.role });
 });
 
 module.exports = router;

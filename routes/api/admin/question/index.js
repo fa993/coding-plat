@@ -35,13 +35,7 @@ router.post('/add', async (req, res) => {
 	res.send(question._id);
 });
 
-router.get('/list', async (req, res) => {
-	return res.json(
-		await Question.find({})
-			.skip(req.query.offset || 0)
-			.limit(5)
-	);
-});
+router.use('/list', require('./list'));
 
 router.put('/edit', async (req, res) => {
 	const { id, title, desc } = req.body;

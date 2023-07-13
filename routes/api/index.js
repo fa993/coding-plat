@@ -4,6 +4,12 @@ router.get('/protected', (req, res) => {
 	res.send('Hello World');
 });
 
+//global rulesets since these should be accesible by both
+
+router.use('/question/list', require('./admin/question/list'));
+
+router.use('/results', require('./participant/results'));
+
 router.use(
 	'/admin/',
 	(req, res, next) => {

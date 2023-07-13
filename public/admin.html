@@ -1,0 +1,212 @@
+<html>
+    <head>
+        <title>Coding Platform - Admin Panel</title>
+        <style>
+            body {
+                text-align: center;
+            }
+            table {
+                margin: auto;
+                width: 80%;
+            }
+            td,th {
+                width: 25%;
+                text-align: center;
+            }
+            #status {
+                margin-top: 5px;
+            }
+            button {
+                margin-right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>
+            <b>Admin - Questions </b>
+        </h1>
+        <input id="name" placeholder="Enter name">
+        <input id="desc" placeholder="Enter description">
+        <button id="save">Save</button>
+        <div id="status"></div>
+        <br>
+        <table id="qs">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tbbo">
+
+            </tbody>
+        </table>
+        <div style="display: none;" id="tcview">
+            <h2>TestCases</h2>
+            <input id="num" placeholder="Enter number">
+            <input id="inp" placeholder="Enter input">
+            <input id="out" placeholder="Enter output">
+            <input id="limit" placeholder="Enter time limit">
+            <button id="savetc">Save</button> 
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Number</th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th>Limit</th>
+                    </tr>
+                </thead>
+                <tbody id="tstcs">
+
+                </tbody>
+            </table>
+        </div>
+        <script type="text/javascript">
+            var mode=""
+            var sta = document.getElementById('status')
+            var tbl = document.getElementById('qs');
+            var tbody = document.getElementById('tbbo');
+            var animh = undefined;
+            var loading = false
+            var nm = document.getElementById('name');
+            var de = document.getElementById('desc');
+            var tcview = document.getElementById('tcview');
+            var tcnum = document.getElementById('num')
+            var tcinp = document.getElementById('inp')
+            var tcout = document.getElementById('out')
+            var tclim = document.getElementById('limit')
+            var tct = document.getElementById('tstcs')
+
+            function startLoadingAnimation() {
+                loading = true;
+                nextTick(0)
+            }
+
+            function nextTick(iin) {
+                animh = setInterval((i) => {
+                    st = "Loading";
+                    for(var ty = 0; ty < i; ty++) {
+                        st += '.';
+                    }
+                    if(loading) {
+                        sta.innerHTML = st;
+                        nextTick((i + 1) % 3)
+                    }
+                }, 200, iin)
+            }
+
+            function cancelAnimation() {
+                loading = false;
+            }
+
+            function deleteQuestion(eleid) {
+                return () => {
+                    startLoadingAnimation();
+                    fetch(window.location.origin + "/api/admin/question/delete", {method: 'DELETE', body: JSON.stringify({id: eleid}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                        cancelAnimation()
+                        if(t.ok) {
+                            sta.innerHTML="Action Completed";
+                        } else {
+                            console.log(t.text())
+                            sta.innerHTML = "Action Failed"
+                        }
+                    }).then(t => {
+                        populateQuestionTable();
+                    })
+                }
+            }
+
+            function editQuestion(eleid, title, desc) {
+                return () => {
+                    mode = eleid;
+                    sta.innerHTML = "Editing";
+                    nm.value = title;
+                    de.value = desc;
+                }
+            }
+
+            function populateQuestionTable() {
+                fetch(window.location.origin + '/api/admin/question/list').then(t => {
+                    if(t.ok) {
+                        return t.json(); 
+                    } else {
+                        sta.innerHTML = "Could not load data";
+                        console.log(t.text())
+                    }
+                }).then(t => {
+                    tbody.innerHTML = '';
+                    t.forEach(element => {
+                        var row = tbody.insertRow()   
+                        c1 = row.insertCell(0);
+                        c1.innerHTML = element._id
+                        c2 = row.insertCell(1);
+                        c2.innerHTML = element.title
+                        c3 = row.insertCell(2);
+                        c3.innerHTML = element.description;   
+                        c4 = row.insertCell(3);
+                        ebe = document.createElement('button');
+                        ebe.innerHTML = 'Edit';
+                        ebe.addEventListener('click', editQuestion(element._id, element.title, element.description))
+                        c4.appendChild(ebe);
+                        dbe = document.createElement('button');
+                        dbe.innerHTML = "Delete";
+                        dbe.addEventListener('click', deleteQuestion(element._id))
+                        c4.appendChild(dbe)
+                    });
+                })
+            }
+
+            function addQuestion() {
+                startLoadingAnimation();
+                fetch(window.location.origin + "/api/admin/question/add", {method: 'POST', body: JSON.stringify({title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                    cancelAnimation()
+                    if(t.ok) {
+                        sta.innerHTML="Action Completed";
+                        return t.text();
+                    } else {
+                        console.log(t.text())
+                        sta.innerHTML = "Action Failed"
+                    }
+                }).then(t => {
+                    populateQuestionTable();
+                })
+
+            }
+
+            function actualEdit(eleid) {
+                startLoadingAnimation();
+                fetch(window.location.origin + "/api/admin/question/edit", {method: 'PUT', body: JSON.stringify({id: eleid, title: nm.value, desc: de.value}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                    cancelAnimation()
+                    if(t.ok) {
+                        sta.innerHTML="Action Completed";
+                        return t.text();
+                    } else {
+                        console.log(t.text())
+                        sta.innerHTML = "Action Failed"
+                    }
+                }).then(t => {
+                    populateQuestionTable();
+                })
+            }
+
+            function populateTestCases() {
+
+            }
+
+            document.getElementById('save').addEventListener('click', e => {
+                if(mode == '') {
+                    addQuestion();
+                } else {
+                    actualEdit(mode);
+                    mode = '';
+                }
+            });
+
+            populateQuestionTable();
+        </script>
+    </body>
+</html>

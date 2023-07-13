@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Coding Platform</title>
+        <style>
+            body {
+                text-align: center;
+            }
+            h1, input, button {
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>
+            <b>Login</b>
+        </h1>
+        <input id="email" placeholder="Enter email">
+        <br>
+        <input type="password" id="psswd" placeholder="Enter password">
+        <br>
+        <button id="subbtn">Login</button>
+        <script type="text/javascript">
+            document.getElementById('subbtn').addEventListener('click', e => {
+                usnam = document.getElementById('email').value;
+                pas = document.getElementById('psswd').value;
+                fetch(window.location.origin + "/login", {method: 'POST', body: JSON.stringify({email: usnam, password: pas}), headers: {'Content-Type': 'application/json'}}).then(t => {
+                    if(t.ok) {
+                        return t.json();
+                    } else {
+                        console.log(t.text())
+                    }}).then(f => {
+                    if(f.role=='admin') {
+                        location.href='admin.html'
+                    } else {
+                        location.href='participant.html'
+                    }
+                })
+            });
+        </script>
+    </body>
+</html>
